@@ -6,7 +6,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/EM-Creations/Energy-Co-op-Server">
+  <a href="https://github.com/Energy-Co-op/Energy-Co-op-Server">
     <img src="https://www.windcoop.co.uk/wp-content/uploads/go-x/u/14699fc7-4639-4665-9c87-1dbd1f1ef1af/image-160x160.png" alt="Logo" width="160" height="160">
   </a>
 
@@ -15,14 +15,14 @@
   <p align="center">
     Spring Boot Energy Cooperative management server.
     <br />
-    <a href="https://github.com/EM-Creations/Energy-Co-op-Server"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/Energy-Co-op/Energy-Co-op-Server"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/EM-Creations/Energy-Co-op-Server">View Demo</a>
+    <a href="https://github.com/Energy-Co-op/Energy-Co-op-Server">View Demo</a>
     ·
-    <a href="https://github.com/EM-Creations/Energy-Co-op-Server/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://github.com/Energy-Co-op/Energy-Co-op-Server/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     ·
-    <a href="https://github.com/EM-Creations/Energy-Co-op-Server/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/Energy-Co-op/Energy-Co-op-Server/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -58,10 +58,10 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Energy Co-op Server Screen Shot](https://github.com/EM-Creations/Energy-Co-op-Server/blob/main/public/demo.jpg)](https://github.com/EM-Creations/Energy-Co-op-Server)
+[![Energy Co-op Server Screen Shot](https://github.com/Energy-Co-op/Energy-Co-op-Server/blob/main/public/demo.jpg)](https://github.com/Energy-Co-op/Energy-Co-op-Server)
 
 Energy Co-op Server is intended to be a Spring Boot server backend to facilitate the management of users accessing Energy Co-op information.
-This application is designed to run in conjunction with the [Energy Co-op UI](https://github.com/EM-Creations/Energy-Co-op-UI).
+This application is designed to run in conjunction with the [Energy Co-op UI](https://github.com/Energy-Co-op/Energy-Co-op-UI).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -86,7 +86,7 @@ This application is designed to run in conjunction with the [Energy Co-op UI](ht
 * PostgreSQL 17+ database
 * Vensys API keys
 * Auth0 account
-* [UI Project setup](https://github.com/EM-Creations/Energy-Co-op-UI)
+* [UI Project setup](https://github.com/Energy-Co-op/Energy-Co-op-UI)
 * [Podman (optional)](https://podman-desktop.io/)
 
 ### Auth0 setup
@@ -222,7 +222,7 @@ The application is designed to be deployed via OCI images using Podman or Docker
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-For more examples, please refer to the [Documentation](https://github.com/EM-Creations/Energy-Co-op-Server)
+For more examples, please refer to the [Documentation](https://github.com/Energy-Co-op/Energy-Co-op-Server)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -260,13 +260,13 @@ Distributed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 [contributors-shield]: https://img.shields.io/github/contributors/EM-Creations/Energy-Co-op-Server.svg?style=for-the-badge
-[contributors-url]: https://github.com/EM-Creations/Energy-Co-op-Server/graphs/contributors
+[contributors-url]: https://github.com/Energy-Co-op/Energy-Co-op-Server/graphs/contributors
 [stars-shield]: https://img.shields.io/github/stars/EM-Creations/Energy-Co-op-Server.svg?style=for-the-badge
-[stars-url]: https://github.com/EM-Creations/Energy-Co-op-Server/stargazers
+[stars-url]: https://github.com/Energy-Co-op/Energy-Co-op-Server/stargazers
 [issues-shield]: https://img.shields.io/github/issues/EM-Creations/Energy-Co-op-Server.svg?style=for-the-badge
-[issues-url]: https://github.com/EM-Creations/Energy-Co-op-Server/issues
+[issues-url]: https://github.com/Energy-Co-op/Energy-Co-op-Server/issues
 [license-shield]: https://img.shields.io/badge/Creative%20Commons-000000?style=for-the-badge&logo=creativecommons&logoColor=white
-[license-url]: https://github.com/EM-Creations/Energy-Co-op-Server/blob/main/LICENSE
+[license-url]: https://github.com/Energy-Co-op/Energy-Co-op-Server/blob/main/LICENSE
 [product-screenshot]: images/screenshot.png
 [java]: https://img.shields.io/badge/Java-DD0031?style=for-the-badge&logo=java&logoColor=white
 [java-url]: https://java.com/
