@@ -11,7 +11,7 @@ apacheCommonsVersion = "3.20.0"
 postgresqlVersion = "42.7.8"
 
 # Plugin versions
-springBootVersion = "3.5.7"
+springBootVersion = "4.0.0"
 
 springDependencyManagementVersion = "1.1.7"
 
