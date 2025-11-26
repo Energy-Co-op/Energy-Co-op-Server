@@ -6,7 +6,7 @@ mockitoVersion = "5.20.0"
 
 auth0Version = "3.0.7"
 
-apacheCommonsVersion = "3.19.0"
+apacheCommonsVersion = "3.20.0"
 
 postgresqlVersion = "42.7.8"
 
