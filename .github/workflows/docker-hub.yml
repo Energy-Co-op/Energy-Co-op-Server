@@ -1,0 +1,92 @@
+name: Docker Hub Build
+run-name: Docker Hub build by ${{ github.actor }} 🚀
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Docker Hub Build'
+
+permissions:
+  actions: read
+  checks: write
+  contents: read
+  issues: read
+  packages: write
+  pull-requests: write
+  statuses: read
+  security-events: write
+
+env:
+  IMAGE_NAME: energycoop-server
+  IMAGE_TAGS: v1 latest ${{ github.sha }}
+  IMAGE_REGISTRY_DOCKERHUB: docker.io/statusred
+  REGISTRY_USER: ${{ github.actor }}
+  REGISTRY_PASSWORD: ${{ github.token }}
+
+jobs:
+  Build-With-Tests-Linux:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'zulu'
+
+      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
+      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: build-${{ github.sha }}
+          path: |
+            build/libs/
+          retention-days: 1
+
+  OCI-Image:
+    runs-on: ubuntu-latest
+    needs:
+      - Build-With-Tests-Linux
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-${{ github.sha }}
+          path: |
+            build/libs/
+
+# Build Docker Hub image and push to registry
+      - name: Buildah Action (DockerHub)
+        id: build-image-dockerhub
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.IMAGE_TAGS }}
+          oci: true
+          containerfiles: |
+            ./Containerfile
+
+      - name: Push to Docker Hub
+        id: push-to-dockerhub
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image-dockerhub.outputs.image }}
+          tags: ${{ steps.build-image-dockerhub.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY_DOCKERHUB }}
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Print image url (DOCKERHUB)
+        run: echo "Image pushed to ${{ steps.push-to-dockerhub.outputs.registry-paths }}"
+
