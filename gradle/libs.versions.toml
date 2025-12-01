@@ -1,6 +1,6 @@
 [versions]
 # Library versions
-springDocVersion = "2.8.13"
+springDocVersion = "3.0.0"
 
 mockitoVersion = "5.20.0"
 
