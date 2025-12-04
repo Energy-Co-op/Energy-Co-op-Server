@@ -35,7 +35,7 @@ public class SchedulerConfig {
     @Autowired
     private final GraigFathaStatsService graigFathaStatsService;
 
-    @Scheduled(cron = "${scheduling.graig-fatha.schedule.energy-yield:0 */15 * * * *}")
+    @Scheduled(cron = "${scheduling.graig-fatha.schedule.energy-yield:15 */15 * * * *}")
     public void logEnergyYield() {
         log.info("logEnergyYield running..");
 
@@ -51,7 +51,7 @@ public class SchedulerConfig {
         }
     }
 
-    @Scheduled(cron = "${scheduling.graig-fatha.schedule.performance:0 0 */6 * * *}")
+    @Scheduled(cron = "${scheduling.graig-fatha.schedule.performance:5 0 */6 * * *}")
     public void logPerformance() {
         log.info("logPerformance running..");
 
