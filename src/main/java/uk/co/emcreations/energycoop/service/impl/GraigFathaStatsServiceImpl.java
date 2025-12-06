@@ -91,7 +91,7 @@ public class GraigFathaStatsServiceImpl implements GraigFathaStatsService {
         log.info("getCurrentPerformance() called");
 
         VensysPerformanceDataResponse response = client.getCurrentPerformance();
-        validatePerformanceData(response);
+        //validatePerformanceData(response); // For now don't alert on current performance calls
 
         if (isInvalidResponse(response)) {
             log.warn("No current performance data available");
