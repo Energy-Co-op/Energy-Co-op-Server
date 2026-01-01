@@ -2,7 +2,7 @@
 # Library versions
 springDocVersion = "2.8.13"
 
-mockitoVersion = "5.20.0"
+mockitoVersion = "5.21.0"
 
 auth0Version = "3.0.8"
 
