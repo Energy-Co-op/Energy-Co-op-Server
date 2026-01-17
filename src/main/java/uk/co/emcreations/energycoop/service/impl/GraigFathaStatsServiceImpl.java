@@ -1,5 +1,7 @@
 package uk.co.emcreations.energycoop.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,10 +10,12 @@ import uk.co.emcreations.energycoop.dto.VensysMeanData;
 import uk.co.emcreations.energycoop.dto.VensysMeanDataResponse;
 import uk.co.emcreations.energycoop.dto.VensysPerformanceData;
 import uk.co.emcreations.energycoop.dto.VensysPerformanceDataResponse;
+import uk.co.emcreations.energycoop.entity.PerformanceStatEntry;
 import uk.co.emcreations.energycoop.model.Site;
 import uk.co.emcreations.energycoop.service.AlertService;
 import uk.co.emcreations.energycoop.service.GraigFathaStatsService;
 import uk.co.emcreations.energycoop.sourceclient.VensysGraigFathaClient;
+import uk.co.emcreations.energycoop.util.EntityHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,10 +25,12 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class GraigFathaStatsServiceImpl implements GraigFathaStatsService {
     private final VensysGraigFathaClient client;
     private final AlertService alertService;
+    private final EntityManager entityManager;
 
     @Value("${alerts.thresholds.availability:75.0}")
     private double availabilityThreshold;
@@ -85,6 +91,30 @@ public class GraigFathaStatsServiceImpl implements GraigFathaStatsService {
         }
 
         return Optional.of(response.data()[0]);
+    }
+
+    @Override
+    public void logPerformance(final LocalDate from, final LocalDate to) {
+        log.info("logPerformance() called from: {}, to: {}", from, to);
+
+        LocalDate current = from;
+        while (!current.isAfter(to)) {
+            var dayStart = LocalDateTime.of(current, LocalTime.MIDNIGHT);
+            var dayEnd = LocalDateTime.of(current, LocalTime.MAX);
+
+            Optional<VensysPerformanceData> performanceDataOptional = getPerformance(dayStart, dayEnd);
+
+            if (performanceDataOptional.isPresent()) {
+                VensysPerformanceData performanceData = performanceDataOptional.get();
+                PerformanceStatEntry entry = EntityHelper.createPerformanceStatEntry(performanceData, Site.GRAIG_FATHA);
+                entityManager.persist(entry);
+                log.info("Persisted performance data for date: {}", current);
+            } else {
+                log.warn("No valid performance data available for date: {}", current);
+            }
+
+            current = current.plusDays(1);
+        }
     }
 
     private Optional<VensysPerformanceData> getCurrentPerformance() {

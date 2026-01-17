@@ -1,5 +1,6 @@
 package uk.co.emcreations.energycoop.service.impl;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +34,9 @@ class GraigFathaStatsServiceImplTest {
 
     @Mock
     private AlertService alertService;
+
+    @Mock
+    private EntityManager entityManager;
 
     @InjectMocks
     private GraigFathaStatsServiceImpl service;
@@ -274,6 +278,283 @@ class GraigFathaStatsServiceImplTest {
             service.getPerformance(from, to);
 
             verify(alertService, never()).sendAlert(any(), any());
+        }
+    }
+
+    @Nested
+    @DisplayName("logPerformance tests")
+    class LogPerformanceTests {
+        @Test
+        @DisplayName("Persists performance data for single day")
+        void logPerformance_persistsDataForSingleDay() {
+            var date = LocalDate.of(2025, 11, 5);
+            var perfData = VensysPerformanceData.builder()
+                    .date(LocalDateTime.of(date, LocalTime.MIDNIGHT))
+                    .energyYield(100.0)
+                    .availability(85.0)
+                    .powerAvg(50.0)
+                    .powerMax(100.0)
+                    .windAvg(8.5)
+                    .windMax(15.0)
+                    .powerProductionTime(3600.0)
+                    .lowWindTime(1800.0)
+                    .errorTime(0.0)
+                    .serviceTime(0.0)
+                    .iceTime(0.0)
+                    .stormTime(0.0)
+                    .shadowTime(0.0)
+                    .twistTime(0.0)
+                    .gridFailureTime(0.0)
+                    .commFailureTime(0.0)
+                    .visitTime(0.0)
+                    .serverStopTime(0.0)
+                    .fireTime(0.0)
+                    .batMonitoringTime(0.0)
+                    .nightShutdownTime(0.0)
+                    .build();
+
+            VensysPerformanceDataResponse response = mock(VensysPerformanceDataResponse.class);
+            when(response.data()).thenReturn(new VensysPerformanceData[]{perfData});
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(response);
+
+            service.logPerformance(date, date);
+
+            verify(client).getPerformance(anyLong(), anyLong());
+            verify(entityManager).persist(any());
+        }
+
+        @Test
+        @DisplayName("Persists performance data for multiple days")
+        void logPerformance_persistsDataForMultipleDays() {
+            var fromDate = LocalDate.of(2025, 11, 5);
+            var toDate = LocalDate.of(2025, 11, 7);
+
+            var perfData = VensysPerformanceData.builder()
+                    .energyYield(100.0)
+                    .availability(85.0)
+                    .powerAvg(50.0)
+                    .powerMax(100.0)
+                    .windAvg(8.5)
+                    .windMax(15.0)
+                    .powerProductionTime(3600.0)
+                    .lowWindTime(1800.0)
+                    .errorTime(0.0)
+                    .serviceTime(0.0)
+                    .iceTime(0.0)
+                    .stormTime(0.0)
+                    .shadowTime(0.0)
+                    .twistTime(0.0)
+                    .gridFailureTime(0.0)
+                    .commFailureTime(0.0)
+                    .visitTime(0.0)
+                    .serverStopTime(0.0)
+                    .fireTime(0.0)
+                    .batMonitoringTime(0.0)
+                    .nightShutdownTime(0.0)
+                    .build();
+
+            VensysPerformanceDataResponse response = mock(VensysPerformanceDataResponse.class);
+            when(response.data()).thenReturn(new VensysPerformanceData[]{perfData});
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(response);
+
+            service.logPerformance(fromDate, toDate);
+
+            verify(client, times(3)).getPerformance(anyLong(), anyLong());
+            verify(entityManager, times(3)).persist(any());
+        }
+
+        @Test
+        @DisplayName("Skips persistence when performance data is unavailable")
+        void logPerformance_skipsWhenNoDataAvailable() {
+            var date = LocalDate.of(2025, 11, 5);
+
+            VensysPerformanceDataResponse response = mock(VensysPerformanceDataResponse.class);
+            when(response.data()).thenReturn(null);
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(response);
+
+            service.logPerformance(date, date);
+
+            verify(client).getPerformance(anyLong(), anyLong());
+            verify(entityManager, never()).persist(any());
+        }
+
+        @Test
+        @DisplayName("Handles mixed valid and invalid data across date range")
+        void logPerformance_handlesMixedValidAndInvalidData() {
+            var fromDate = LocalDate.of(2025, 11, 5);
+            var toDate = LocalDate.of(2025, 11, 7);
+
+            var validPerfData = VensysPerformanceData.builder()
+                    .energyYield(100.0)
+                    .availability(85.0)
+                    .powerAvg(50.0)
+                    .powerMax(100.0)
+                    .windAvg(8.5)
+                    .windMax(15.0)
+                    .powerProductionTime(3600.0)
+                    .lowWindTime(1800.0)
+                    .errorTime(0.0)
+                    .serviceTime(0.0)
+                    .iceTime(0.0)
+                    .stormTime(0.0)
+                    .shadowTime(0.0)
+                    .twistTime(0.0)
+                    .gridFailureTime(0.0)
+                    .commFailureTime(0.0)
+                    .visitTime(0.0)
+                    .serverStopTime(0.0)
+                    .fireTime(0.0)
+                    .batMonitoringTime(0.0)
+                    .nightShutdownTime(0.0)
+                    .build();
+
+            VensysPerformanceDataResponse validResponse = mock(VensysPerformanceDataResponse.class);
+            when(validResponse.data()).thenReturn(new VensysPerformanceData[]{validPerfData});
+
+            VensysPerformanceDataResponse invalidResponse = mock(VensysPerformanceDataResponse.class);
+            when(invalidResponse.data()).thenReturn(new VensysPerformanceData[]{});
+
+            when(client.getPerformance(anyLong(), anyLong()))
+                    .thenReturn(validResponse)
+                    .thenReturn(invalidResponse)
+                    .thenReturn(validResponse);
+
+            service.logPerformance(fromDate, toDate);
+
+            verify(client, times(3)).getPerformance(anyLong(), anyLong());
+            verify(entityManager, times(2)).persist(any());
+        }
+
+        @Test
+        @DisplayName("Persists data for same day when from and to dates are equal")
+        void logPerformance_persistsDataWhenFromAndToAreSame() {
+            var date = LocalDate.of(2025, 11, 5);
+
+            var perfData = VensysPerformanceData.builder()
+                    .date(LocalDateTime.of(date, LocalTime.MIDNIGHT))
+                    .energyYield(100.0)
+                    .availability(85.0)
+                    .powerAvg(50.0)
+                    .powerMax(100.0)
+                    .windAvg(8.5)
+                    .windMax(15.0)
+                    .powerProductionTime(3600.0)
+                    .lowWindTime(1800.0)
+                    .errorTime(0.0)
+                    .serviceTime(0.0)
+                    .iceTime(0.0)
+                    .stormTime(0.0)
+                    .shadowTime(0.0)
+                    .twistTime(0.0)
+                    .gridFailureTime(0.0)
+                    .commFailureTime(0.0)
+                    .visitTime(0.0)
+                    .serverStopTime(0.0)
+                    .fireTime(0.0)
+                    .batMonitoringTime(0.0)
+                    .nightShutdownTime(0.0)
+                    .build();
+
+            VensysPerformanceDataResponse response = mock(VensysPerformanceDataResponse.class);
+            when(response.data()).thenReturn(new VensysPerformanceData[]{perfData});
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(response);
+
+            service.logPerformance(date, date);
+
+            verify(client, times(1)).getPerformance(anyLong(), anyLong());
+            verify(entityManager, times(1)).persist(any());
+        }
+
+        @Test
+        @DisplayName("Calls getPerformance with correct start and end times for each day")
+        void logPerformance_callsGetPerformanceWithCorrectTimestamps() {
+            var date = LocalDate.of(2025, 11, 5);
+
+            var perfData = VensysPerformanceData.builder()
+                    .date(LocalDateTime.of(date, LocalTime.MIDNIGHT))
+                    .energyYield(100.0)
+                    .availability(85.0)
+                    .powerAvg(50.0)
+                    .powerMax(100.0)
+                    .windAvg(8.5)
+                    .windMax(15.0)
+                    .powerProductionTime(3600.0)
+                    .lowWindTime(1800.0)
+                    .errorTime(0.0)
+                    .serviceTime(0.0)
+                    .iceTime(0.0)
+                    .stormTime(0.0)
+                    .shadowTime(0.0)
+                    .twistTime(0.0)
+                    .gridFailureTime(0.0)
+                    .commFailureTime(0.0)
+                    .visitTime(0.0)
+                    .serverStopTime(0.0)
+                    .fireTime(0.0)
+                    .batMonitoringTime(0.0)
+                    .nightShutdownTime(0.0)
+                    .build();
+
+            VensysPerformanceDataResponse response = mock(VensysPerformanceDataResponse.class);
+            when(response.data()).thenReturn(new VensysPerformanceData[]{perfData});
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(response);
+
+            service.logPerformance(date, date);
+
+            verify(client).getPerformance(anyLong(), anyLong());
+        }
+
+        @Test
+        @DisplayName("Sends alert for invalid data during logPerformance")
+        void logPerformance_sendsAlertForInvalidData() {
+            var date = LocalDate.of(2025, 11, 5);
+
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(null);
+
+            service.logPerformance(date, date);
+
+            verify(client).getPerformance(anyLong(), anyLong());
+            verify(alertService).sendAlert(eq(Site.GRAIG_FATHA), contains("Performance response is null"));
+            verify(entityManager, never()).persist(any());
+        }
+
+        @Test
+        @DisplayName("Uses GraigFatha site when persisting performance data")
+        void logPerformance_usesGraigFathaSite() {
+            var date = LocalDate.of(2025, 11, 5);
+
+            var perfData = VensysPerformanceData.builder()
+                    .date(LocalDateTime.of(date, LocalTime.MIDNIGHT))
+                    .energyYield(100.0)
+                    .availability(85.0)
+                    .powerAvg(50.0)
+                    .powerMax(100.0)
+                    .windAvg(8.5)
+                    .windMax(15.0)
+                    .powerProductionTime(3600.0)
+                    .lowWindTime(1800.0)
+                    .errorTime(0.0)
+                    .serviceTime(0.0)
+                    .iceTime(0.0)
+                    .stormTime(0.0)
+                    .shadowTime(0.0)
+                    .twistTime(0.0)
+                    .gridFailureTime(0.0)
+                    .commFailureTime(0.0)
+                    .visitTime(0.0)
+                    .serverStopTime(0.0)
+                    .fireTime(0.0)
+                    .batMonitoringTime(0.0)
+                    .nightShutdownTime(0.0)
+                    .build();
+
+            VensysPerformanceDataResponse response = mock(VensysPerformanceDataResponse.class);
+            when(response.data()).thenReturn(new VensysPerformanceData[]{perfData});
+            when(client.getPerformance(anyLong(), anyLong())).thenReturn(response);
+
+            service.logPerformance(date, date);
+
+            verify(entityManager).persist(any());
         }
     }
 }
