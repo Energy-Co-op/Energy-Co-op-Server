@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.co.emcreations.energycoop.dto.EnergySaving;
 import uk.co.emcreations.energycoop.model.Site;
 import uk.co.emcreations.energycoop.security.HasGraigFathaStatsRead;
+import uk.co.emcreations.energycoop.security.HasTaxDocumentRead;
 import uk.co.emcreations.energycoop.service.GraigFathaMemberService;
 import uk.co.emcreations.energycoop.util.PrincipalHelper;
 
@@ -53,7 +54,7 @@ public class GraigFathaMemberController {
         return graigFathaMemberService.getSavings(from, to, ownerships.get(Site.GRAIG_FATHA), userId);
     }
 
-    @HasGraigFathaStatsRead
+    @HasTaxDocumentRead
     @GetMapping(name = "Generate tax document", value = "/tax-document/{from}/{to}")
     @Operation(summary = "Generate a tax document between dates", description = "Returns this user's tax document between dates")
     public ResponseEntity<byte[]> generateTaxDocument(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") final LocalDate from, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") final LocalDate to,
