@@ -50,16 +50,23 @@ tasks.jacocoTestCoverageVerification {
 }
 
 extra["snippetsDir"] = file("build/generated-snippets")
-extra["springCloudVersion"] = "2025.0.0"
+extra["springCloudVersion"] = "2025.1.0"
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-graphql")
 	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client")
+	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
+
+	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-webservices")
+
 	implementation("org.springframework.cloud:spring-cloud-starter")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-graphql")
+
 	implementation("org.springframework.session:spring-session-core")
 	implementation(libs.springDoc)
 	implementation(libs.auth0)
@@ -73,10 +80,10 @@ dependencies {
 
 	testImplementation(libs.mockito)
 	mockitoAgent(libs.mockito) { isTransitive = false }
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.graphql:spring-graphql-test")
+	testImplementation("org.springframework.boot:spring-boot-webmvc-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-graphql-test")
 	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
