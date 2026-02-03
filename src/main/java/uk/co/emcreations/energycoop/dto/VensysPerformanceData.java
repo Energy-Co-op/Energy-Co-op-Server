@@ -2,7 +2,6 @@ package uk.co.emcreations.energycoop.dto;
 
 import lombok.Builder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -15,7 +14,6 @@ public record VensysPerformanceData(String tid, LocalDateTime date,
                                     double windMax,
                                     int valuesCount,
                                     int errorCount,
-                                    double operationCount,
                                     double powerProductionTime,
                                     double lowWindTime,
                                     double errorTime, double serviceTime, double iceTime, double stormTime, double shadowTime,
